@@ -8,7 +8,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.0.2
-Release:	0.2
+Release:	1
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/

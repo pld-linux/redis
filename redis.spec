@@ -73,8 +73,8 @@ rm -fr $RPM_BUILD_ROOT
 /sbin/chkconfig --add redis
 
 %pre
-%groupadd -g 99 redis
-%useradd -u 99 -g redis -d %{_sharedstatedir}/redis -s /sbin/nologin -c 'Redis Server' redis
+%groupadd -g 256 redis
+%useradd -u 245 -g redis -d %{_sharedstatedir}/redis -s /sbin/nologin -c 'Redis Server' redis
 
 %preun
 if [ "$1" = 0 ]; then

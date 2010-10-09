@@ -8,7 +8,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.0.2
-Release:	0.1
+Release:	0.2
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/
@@ -17,11 +17,20 @@ Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Patch0:		%{name}-redis.conf.patch
+BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
 %{?with_tests:BuildRequires:	tcl}
-Requires(post):	/sbin/chkconfig
-Requires(preun):	/sbin/chkconfig
-Requires(preun):	rc-scripts
+Requires:	rc-scripts
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/useradd
+Requires(postun):	/usr/sbin/groupdel
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires:	rc-scripts
+Provides:	group(redis)
+Provides:	user(redis)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -69,17 +78,24 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/run/%{name}
 %clean
 rm -fr $RPM_BUILD_ROOT
 
-%post
-/sbin/chkconfig --add redis
-
 %pre
 %groupadd -g 256 redis
-%useradd -u 245 -g redis -d %{_sharedstatedir}/redis -s /sbin/nologin -c 'Redis Server' redis
+%useradd -u 256 -g redis -d %{_sharedstatedir}/redis -s /sbin/nologin -c 'Redis Server' redis
+
+%post
+/sbin/chkconfig --add redis
+%service redis restart
 
 %preun
 if [ "$1" = 0 ]; then
 	%service redis stop
 	/sbin/chkconfig --del redis
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+	%userremove redis
+	%groupremove redis
 fi
 
 %files

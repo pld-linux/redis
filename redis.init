@@ -41,7 +41,7 @@ start() {
 	fi
 
 	msg_starting "Redis"
-    daemon --user ${REDIS_USER:-redis} /usr/sbin/redis $REDIS_CONFIG
+    daemon --user ${REDIS_USER:-redis} /usr/sbin/redis-server $REDIS_CONFIG
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/redis
 }

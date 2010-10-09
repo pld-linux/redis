@@ -2,87 +2,99 @@
 #
 # redis        init file for starting up the redis daemon
 #
-# chkconfig:   - 20 80
+# chkconfig:	345 20 80
+#
 # description: Starts and stops the redis daemon.
+# processname:	redis-server
+#
+# $Id$
 
-# Source function library.
+# Source function library
 . /etc/rc.d/init.d/functions
 
-name="redis-server"
-exec="/usr/sbin/$name"
-pidfile="/var/run/redis/redis.pid"
+# Get network config
+. /etc/sysconfig/network
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
+		msg_network_down "Redis"
+		exit 1
+	fi
+else
+	exit 0
+fi
+
 REDIS_CONFIG="/etc/redis.conf"
+REDIS_USER="redis"
 
-[ -e /etc/sysconfig/redis ] && . /etc/sysconfig/redis
+# Get service config - may override defaults
+[ -f /etc/sysconfig/redis ] && . /etc/sysconfig/redis
 
-lockfile=/var/lock/subsys/redis
+pidfile="/var/run/redis/redis.pid"
 
 start() {
-    [ -f $REDIS_CONFIG ] || exit 6
-    [ -x $exec ] || exit 5
-    echo -n $"Starting $name: "
-    daemon --user ${REDIS_USER-redis} "$exec $REDIS_CONFIG"
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
+	# Check if the service is already running?
+	if [ -f /var/lock/subsys/redis ]; then
+		msg_already_running "Redis"
+		return
+	fi
+
+	msg_starting "Redis"
+    daemon --user ${REDIS_USER:-redis} /usr/sbin/redis $REDIS_CONFIG
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/redis
 }
 
 stop() {
-    echo -n $"Stopping $name: "
-    killproc -p $pidfile $name
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && rm -f $lockfile
-    return $retval
+	if [ ! -f /var/lock/subsys/redis ]; then
+		msg_not_running "Redis"
+		return
+	fi
+
+	# Stop daemons.
+	msg_stopping "Redis"
+	killproc --pidfile $pidfile redis-server -TERM
+	rm -f /var/lock/subsys/redis
 }
 
-restart() {
-    stop
-    start
+condrestart() {
+	if [ ! -f /var/lock/subsys/redis ]; then
+		msg_not_running "Redis"
+		RETVAL=$1
+		return
+	fi
+
+	stop
+	start
 }
 
-reload() {
-    false
-}
-
-rh_status() {
-    status -p $pidfile $name
-}
-
-rh_status_q() {
-    rh_status >/dev/null 2>&1
-}
-
-
+RETVAL=0
+# See how we were called.
 case "$1" in
-    start)
-        rh_status_q && exit 0
-        $1
-        ;;
-    stop)
-        rh_status_q || exit 0
-        $1
-        ;;
-    restart)
-        $1
-        ;;
-    reload)
-        rh_status_q || exit 7
-        $1
-        ;;
-    force-reload)
-        force_reload
-        ;;
-    status)
-        rh_status
-        ;;
-    condrestart|try-restart)
-        rh_status_q || exit 0
-        restart
-        ;;
-    *)
-        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart}"
-        exit 2
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	stop
+	start
+	;;
+  try-restart)
+	condrestart 0
+	;;
+  force-reload)
+	condrestart 7
+	;;
+  status)
+	status --pidfile $pidfile redis redis-server
+	RETVAL=$?
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
+	exit 3
 esac
-exit $?
+
+exit $RETVAL

@@ -100,7 +100,7 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
 install -d $RPM_BUILD_ROOT%{_localstatedir}/run/%{name}
 
 %clean
-rm -fr $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %pre server
 %groupadd -g 256 redis

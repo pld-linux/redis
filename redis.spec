@@ -21,7 +21,7 @@ Version:	2.2.14
 Release:	1
 License:	BSD
 Group:		Applications/Databases
-URL:		http://code.google.com/p/redis/
+URL:		http://www.redis.io/
 Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
 # Source0-md5:	3605e3d4c9465fdfefa2e96f3a408ef5
 Source1:	%{name}.logrotate

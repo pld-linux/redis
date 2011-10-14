@@ -4,22 +4,30 @@
 # Conditional build:
 %if "%{pld_release}" == "ac"
 %bcond_with		tests		# build without tests
+%bcond_with		perftools	# google perftools
 %else
 %bcond_without	tests		# build without tests
+%bcond_without	perftools	# google perftools
+%endif
+
+%ifnarch %{ix86} %{x8664} ppc
+# available only on selected architectures
+%undefine	with_perftools
 %endif
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.0.2
-Release:	4
+Version:	2.2.14
+Release:	1
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/
 Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
-# Source0-md5:	1658ab25161efcc0d0e98b4d1e38a985
+# Source0-md5:	3605e3d4c9465fdfefa2e96f3a408ef5
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Patch0:		%{name}.conf.patch
+%{?with_perftools:BuildRequires:    google-perftools-devel}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
@@ -75,9 +83,12 @@ HTML Documentation for Redis.
 
 %build
 %{__make} all \
-	DEBUG="" \
 	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags} -std=c99"
+	CFLAGS="%{rpmcflags} -std=c99" \
+	DEBUG="" \
+%if %{with perftools}
+	USE_TCMALLOC=yes \
+%endif
 
 %if %{with tests}
 tclsh tests/test_helper.tcl
@@ -85,19 +96,22 @@ tclsh tests/test_helper.tcl
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# Install binaries
-install -p -D %{name}-benchmark $RPM_BUILD_ROOT%{_bindir}/%{name}-benchmark
-install -p -D %{name}-cli $RPM_BUILD_ROOT%{_bindir}/%{name}-cli
-install -p -D %{name}-check-aof $RPM_BUILD_ROOT%{_bindir}/%{name}-check-aof
-install -p -D %{name}-check-dump $RPM_BUILD_ROOT%{_bindir}/%{name}-check-dump
-install -p -D %{name}-server $RPM_BUILD_ROOT%{_sbindir}/%{name}-server
+%{__make} install \
+	PREFIX=$RPM_BUILD_ROOT%{_prefix}
+
+# Fix non-standard-executable-perm error
+chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
+
+# Ensure redis-server location doesn't change
+install -d $RPM_BUILD_ROOT%{_sbindir}
+mv $RPM_BUILD_ROOT%{_bindir}/%{name}-server $RPM_BUILD_ROOT%{_sbindir}/%{name}-server
+
 # Install misc other
-install -p -D %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
-install -p -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
+install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install -p -D %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
-install -d $RPM_BUILD_ROOT%{_localstatedir}/lib/%{name}
-install -d $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
-install -d $RPM_BUILD_ROOT%{_localstatedir}/run/%{name}
+install -d $RPM_BUILD_ROOT%{_localstatedir}/{lib,log,run}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT

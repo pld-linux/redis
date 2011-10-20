@@ -17,13 +17,13 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.2.14
+Version:	2.2.15
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/
 Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
-# Source0-md5:	3605e3d4c9465fdfefa2e96f3a408ef5
+# Source0-md5:	e1b66f316f9276fe44f4cbd20b842c93
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Patch0:		%{name}.conf.patch

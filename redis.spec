@@ -32,7 +32,7 @@ BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
 %{?with_tests:BuildRequires:	tcl >= 8.5}
-ExcludeArch:	sparc sparc64
+ExcludeArch:	sparc sparc64 alpha
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description

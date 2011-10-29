@@ -1,5 +1,6 @@
 # TODO
 # - Check for status of man pages http://code.google.com/p/redis/issues/detail?id=202
+# - use shared jemalloc?
 #
 # Conditional build:
 %if "%{pld_release}" == "ac"
@@ -17,22 +18,24 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.2.15
+Version:	2.4.2
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/
 Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
-# Source0-md5:	e1b66f316f9276fe44f4cbd20b842c93
+# Source0-md5:	c4b0b5e4953a11a503cb54cf6b09670e
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Patch0:		%{name}.conf.patch
 %{?with_perftools:BuildRequires:    google-perftools-devel}
+BuildRequires:	jemalloc-static
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
 %{?with_tests:BuildRequires:	tcl >= 8.5}
 ExcludeArch:	sparc sparc64 alpha
+Obsoletes:	%{name}-doc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -67,13 +70,6 @@ and sets.
 The dataset is stored entirely in memory and periodically flushed to
 disk.
 
-%package doc
-Summary:	documentation for redis
-Group:		Documentation
-
-%description doc
-HTML Documentation for Redis.
-
 %prep
 %setup -q
 %patch0 -p1
@@ -81,14 +77,20 @@ HTML Documentation for Redis.
 %{__sed} -i -e '/    execute_tests "integration\/replication"/d' tests/test_helper.tcl
 %{__sed} -i -e '/    execute_tests "integration\/aof"/d' tests/test_helper.tcl
 
+# use unversioned tclsh
+%{__sed} -i -e 's,tclsh8.5,tclsh', ./runtest tests/test_helper.tcl
+
+# use system jemalloc
+mv deps/jemalloc{,-local}
+install -d deps/jemalloc
+ln -s %{_libdir} deps/jemalloc/lib
+ln -s %{_includedir} deps/jemalloc/include
+
 %build
 %{__make} all \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags} -std=c99" \
 	DEBUG="" \
-%if %{with perftools}
-	USE_TCMALLOC=yes \
-%endif
 
 %if %{with tests}
 tclsh tests/test_helper.tcl
@@ -104,7 +106,7 @@ chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 
 # Ensure redis-server location doesn't change
 install -d $RPM_BUILD_ROOT%{_sbindir}
-mv $RPM_BUILD_ROOT%{_bindir}/%{name}-server $RPM_BUILD_ROOT%{_sbindir}/%{name}-server
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 
 # Install misc other
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
@@ -153,7 +155,3 @@ fi
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
-
-%files doc
-%defattr(644,root,root,755)
-%doc doc/*

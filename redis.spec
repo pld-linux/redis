@@ -98,6 +98,7 @@ tclsh tests/test_helper.tcl
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{_sysconfdir}
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix}
 
@@ -110,10 +111,10 @@ mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 
 # Install misc other
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
-install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install -p -D %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
-install -d $RPM_BUILD_ROOT%{_localstatedir}/{lib,log,run}/%{name}
+cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
+cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
+install -d $RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -154,4 +155,5 @@ fi
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
+%dir %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}

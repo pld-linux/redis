@@ -19,7 +19,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.4.2
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/
@@ -34,6 +34,7 @@ BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
 %{?with_tests:BuildRequires:	tcl >= 8.5}
+Conflicts:	logrotate < 3.8.0
 ExcludeArch:	sparc sparc64 alpha
 Obsoletes:	%{name}-doc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)

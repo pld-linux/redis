@@ -19,7 +19,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.4.2
-Release:	3
+Release:	4
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/

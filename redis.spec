@@ -27,6 +27,7 @@ Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
 # Source0-md5:	c4b0b5e4953a11a503cb54cf6b09670e
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
+Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
 %{?with_perftools:BuildRequires:    google-perftools-devel}
 BuildRequires:	jemalloc-static
@@ -99,7 +100,11 @@ tclsh tests/test_helper.tcl
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_sysconfdir}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
+	$RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d} \
+	$RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}} \
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
+
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix}
 
@@ -107,15 +112,14 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}
 chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 
 # Ensure redis-server location doesn't change
-install -d $RPM_BUILD_ROOT%{_sbindir}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 
 # Install misc other
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
-install -d $RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}}
+
+install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -158,3 +162,4 @@ fi
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
 %dir %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
+/usr/lib/tmpfiles.d/%{name}.conf

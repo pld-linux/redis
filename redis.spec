@@ -19,7 +19,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.4.2
-Release:	4
+Release:	5
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/
@@ -160,6 +160,6 @@ fi
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
-%dir %{_localstatedir}/log/archive/%{name}
+%dir %attr(755,redis,root) %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
 /usr/lib/tmpfiles.d/%{name}.conf

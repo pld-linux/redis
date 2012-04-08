@@ -1,5 +1,4 @@
 /var/log/redis/redis.log {
-	su redis root
 	olddir /var/log/archive/redis
 	create 644 redis redis
 }

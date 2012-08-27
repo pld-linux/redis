@@ -1,0 +1,3 @@
+MAILTO=root
+
+#*/5 * * * * redis redis-cli -h localhost bgrewriteaof > /dev/null

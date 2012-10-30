@@ -18,17 +18,18 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.4.2
+Version:	2.6.2
 Release:	6
 License:	BSD
 Group:		Applications/Databases
 URL:		http://www.redis.io/
 Source0:	http://redis.googlecode.com/files/%{name}-%{version}.tar.gz
-# Source0-md5:	c4b0b5e4953a11a503cb54cf6b09670e
+# Source0-md5:	4f788dfb3ee86c7e864dfe537870bb5a
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
+Patch1:		%{name}-tcl.patch
 %{?with_perftools:BuildRequires:    google-perftools-devel}
 BuildRequires:	jemalloc-static
 BuildRequires:	rpm >= 4.4.9-56
@@ -75,6 +76,7 @@ disk.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 # Remove integration tests
 %{__sed} -i -e '/    execute_tests "integration\/replication"/d' tests/test_helper.tcl
 %{__sed} -i -e '/    execute_tests "integration\/aof"/d' tests/test_helper.tcl
@@ -146,7 +148,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING 00-RELEASENOTES BUGS Changelog README TODO
+%doc COPYING 00-RELEASENOTES BUGS Changelog README
 %attr(755,root,root) %{_bindir}/redis-benchmark
 %attr(755,root,root) %{_bindir}/redis-check-aof
 %attr(755,root,root) %{_bindir}/redis-check-dump

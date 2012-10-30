@@ -1,0 +1,53 @@
+diff -ru redis-2.6.2/runtest redis-2.6.2-patch/runtest
+--- redis-2.6.2/runtest	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-patch/runtest	2012-10-30 12:30:05.185145368 +0100
+@@ -1,5 +1,5 @@
+ #!/bin/sh
+-TCL=tclsh8.5
++TCL=tclsh
+ which $TCL
+ if [ "$?" != "0" ]
+ then
+diff -ru redis-2.6.2/tests/integration/replication-4.tcl redis-2.6.2-patch/tests/integration/replication-4.tcl
+--- redis-2.6.2/tests/integration/replication-4.tcl	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-patch/tests/integration/replication-4.tcl	2012-10-30 12:29:23.092114119 +0100
+@@ -1,5 +1,5 @@
+ proc start_bg_complex_data {host port db ops} {
+-    exec tclsh8.5 tests/helpers/bg_complex_data.tcl $host $port $db $ops &
++    exec tclsh tests/helpers/bg_complex_data.tcl $host $port $db $ops &
+ }
+ 
+ proc stop_bg_complex_data {handle} {
+diff -ru redis-2.6.2/tests/integration/replication.tcl redis-2.6.2-patch/tests/integration/replication.tcl
+--- redis-2.6.2/tests/integration/replication.tcl	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-patch/tests/integration/replication.tcl	2012-10-30 12:29:09.860477648 +0100
+@@ -78,7 +78,7 @@
+ }
+ 
+ proc start_write_load {host port seconds} {
+-    exec tclsh8.5 tests/helpers/gen_write_load.tcl $host $port $seconds &
++    exec tclsh tests/helpers/gen_write_load.tcl $host $port $seconds &
+ }
+ 
+ proc stop_write_load {handle} {
+diff -ru redis-2.6.2/tests/test_helper.tcl redis-2.6.2-patch/tests/test_helper.tcl
+--- redis-2.6.2/tests/test_helper.tcl	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-patch/tests/test_helper.tcl	2012-10-30 12:29:38.411108195 +0100
+@@ -189,7 +189,7 @@
+     set start_port [expr {$::port+100}]
+     for {set j 0} {$j < $::numclients} {incr j} {
+         set start_port [find_available_port $start_port]
+-        set p [exec tclsh8.5 [info script] {*}$::argv \
++        set p [exec tclsh [info script] {*}$::argv \
+             --client $port --port $start_port &]
+         lappend ::clients_pids $p
+         incr start_port 10
+diff -ru redis-2.6.2/utils/speed-regression.tcl redis-2.6.2-patch/utils/speed-regression.tcl
+--- redis-2.6.2/utils/speed-regression.tcl	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-patch/utils/speed-regression.tcl	2012-10-30 12:28:48.069340297 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env tclsh8.5
++#!/usr/bin/env tclsh
+ # Copyright (C) 2011 Salvatore Sanfilippo
+ # Released under the BSD license like Redis itself
+ 

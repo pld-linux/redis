@@ -1,5 +1,6 @@
---- redis-2.4.2/redis.conf~	2011-10-26 17:16:33.000000000 +0300
-+++ redis-2.4.2/redis.conf	2012-06-26 18:50:51.478588041 +0300
+diff -ru redis-2.6.2/redis.conf redis-2.6.2-conf/redis.conf
+--- redis-2.6.2/redis.conf	2012-10-26 16:20:24.000000000 +0200
++++ redis-2.6.2-conf/redis.conf	2012-10-30 13:16:42.576170116 +0100
 @@ -14,11 +14,11 @@
  
  # By default Redis does not run as a daemon. Use 'yes' if you need it.
@@ -27,18 +28,12 @@
  # unixsocketperm 755
  
  # Close the connection after a client is idle for N seconds (0 to disable)
--timeout 300
+-timeout 0
 +timeout 10
  
  # Set server verbosity to 'debug'
  # it can be one of:
-@@ -45,12 +45,12 @@
- # verbose (many rarely useful info, but not a mess like the debug level)
- # notice (moderately verbose, what you want in production probably)
- # warning (only very important / critical messages are logged)
--loglevel verbose
-+loglevel notice
- 
+@@ -50,7 +50,7 @@
  # Specify the log file name. Also 'stdout' can be used to force
  # Redis to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
@@ -56,7 +51,7 @@
  
  ################################ SNAPSHOTTING  #################################
  #
-@@ -104,7 +104,7 @@
+@@ -134,7 +134,7 @@
  # Also the Append Only File will be created inside this directory.
  # 
  # Note that you must specify a directory here, not a file name.
@@ -65,12 +60,3 @@
  
  ################################# REPLICATION #################################
  
-@@ -365,7 +365,7 @@
- # *** WARNING *** if you are using a shared hosting the default of putting
- # the swap file under /tmp is not secure. Create a dir with access granted
- # only to Redis user and configure Redis to create the swap file there.
--vm-swap-file /tmp/redis.swap
-+vm-swap-file /var/lib/redis/redis.swap
- 
- # vm-max-memory configures the VM to use at max the specified amount of
- # RAM. Everything that deos not fit will be swapped on disk *if* possible, that

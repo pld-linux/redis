@@ -7,8 +7,6 @@
 # description: Starts and stops the redis daemon.
 # processname:	redis-server
 #
-# $Id$
-
 # Source function library
 . /etc/rc.d/init.d/functions
 

@@ -18,18 +18,18 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.8.2
+Version:	2.8.8
 Release:	1
 License:	BSD
 Group:		Applications/Databases
-URL:		http://www.redis.io/
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	ee527b0c37e1e2cbceb497f5f6b8112b
+# Source0-md5:	f3af82ca88b9d84c81d0b77614d07426
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
+URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 BuildRequires:	jemalloc-static
 BuildRequires:	rpm >= 4.4.9-56

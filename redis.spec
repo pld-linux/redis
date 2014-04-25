@@ -18,12 +18,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.8.8
+Version:	2.8.9
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	f3af82ca88b9d84c81d0b77614d07426
+# Source0-md5:	3c106b0f1128dc930684e2da88b2a03d
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles

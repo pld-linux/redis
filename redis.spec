@@ -19,7 +19,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	2.8.19
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
@@ -116,7 +116,7 @@ chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 
 # Fix link
-ln -sf %{name}-server $RPM_BUILD_ROOT%{_bindir}/%{name}-sentinel
+ln -sf %{name}-server $RPM_BUILD_ROOT%{_sbindir}/%{name}-sentinel
 
 # Install misc other
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
@@ -160,7 +160,7 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
-%attr(755,root,root) %{_bindir}/redis-sentinel
+%attr(755,root,root) %{_sbindir}/redis-sentinel
 %attr(755,root,root) %{_sbindir}/redis-server
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}

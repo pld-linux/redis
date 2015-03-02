@@ -18,12 +18,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.8.9
+Version:	2.8.19
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	3c106b0f1128dc930684e2da88b2a03d
+# Source0-md5:	3794107224043465603f48941f5c86a7
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
@@ -115,6 +115,9 @@ chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 # Ensure redis-server location doesn't change
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 
+# Fix link
+ln -sf %{name}-server $RPM_BUILD_ROOT%{_bindir}/%{name}-sentinel
+
 # Install misc other
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
@@ -157,6 +160,7 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
+%attr(755,root,root) %{_bindir}/redis-sentinel
 %attr(755,root,root) %{_sbindir}/redis-server
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}

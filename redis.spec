@@ -94,7 +94,7 @@ ln -s %{_includedir} deps/jemalloc/include
 %{__make} -j1 -C src all
 
 %if %{with tests}
-%{__make} test
+%{__make} -j1 test
 %endif
 
 %install

@@ -3,13 +3,8 @@
 # - use shared jemalloc?
 #
 # Conditional build:
-%if "%{pld_release}" == "ac"
-%bcond_with		tests		# build without tests
-%bcond_with		perftools	# google perftools
-%else
 %bcond_without	tests		# build without tests
 %bcond_without	perftools	# google perftools
-%endif
 
 %ifnarch %{ix86} %{x8664} ppc
 # available only on selected architectures

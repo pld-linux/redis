@@ -36,9 +36,9 @@ BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
 %{?with_tests:BuildRequires:	tcl >= 8.5}
+Obsoletes:	redis-doc
 Conflicts:	logrotate < 3.8.0
 ExcludeArch:	sparc sparc64 alpha
-Obsoletes:	%{name}-doc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -104,7 +104,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}} \
-	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir}
 
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix}
@@ -114,16 +114,13 @@ chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 
 # Ensure redis-server location doesn't change
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
-
-# Fix link
-ln -sf %{name}-server $RPM_BUILD_ROOT%{_sbindir}/%{name}-sentinel
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-sentinel
 
 # Install misc other
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
-
-install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -167,4 +164,4 @@ fi
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
-/usr/lib/tmpfiles.d/%{name}.conf
+%{systemdtmpfilesdir}/%{name}.conf

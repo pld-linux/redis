@@ -89,9 +89,10 @@ ln -s %{_libdir} deps/jemalloc/lib
 ln -s %{_includedir} deps/jemalloc/include
 
 %build
-%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags} -std=c99" DEBUG="" V=1
+%define specflags -std=c99 -pedantic
+%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags}" LDFLAGS="%{rpmldflags}" OPTIMIZATION="" DEBUG="" V=1
 
-%{__make} -j1 all
+%{__make} -j1 -C src all
 
 %if %{with tests}
 %{__make} test
@@ -105,6 +106,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT%{systemdtmpfilesdir}
 
 %{__make} install \
+	INSTALL="install -p" \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix}
 
 # Fix non-standard-executable-perm error

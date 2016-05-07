@@ -89,11 +89,9 @@ ln -s %{_libdir} deps/jemalloc/lib
 ln -s %{_includedir} deps/jemalloc/include
 
 %build
-%{__make} -j1 all \
-	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags} -std=c99" \
-	DEBUG="" \
-	V=1
+%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags} -std=c99" DEBUG="" V=1
+
+%{__make} -j1 all
 
 %if %{with tests}
 %{__make} test

@@ -42,15 +42,6 @@ diff -ru redis-2.6.2/redis.conf redis-2.6.2-conf/redis.conf
  
  # To enable logging to the system logger, just set 'syslog-enabled' to yes,
  # and optionally update the other syslog parameters to suit your needs.
-@@ -65,7 +65,7 @@
- # Set the number of databases. The default database is DB 0, you can select
- # a different one on a per-connection basis using SELECT <dbid> where
- # dbid is a number between 0 and 'databases'-1
--databases 16
-+databases 1
- 
- ################################ SNAPSHOTTING  #################################
- #
 @@ -134,7 +134,7 @@
  # Also the Append Only File will be created inside this directory.
  # 

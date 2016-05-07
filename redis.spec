@@ -78,7 +78,7 @@ disk.
 %{__sed} -i -e '/    unit\/memefficiency/d' tests/test_helper.tcl
 
 # randomize port number so concurrent builds doesn't break
-port=$((21110 + ${RANDOM:-$$} % 10))
+port=$((21110 + ${RANDOM:-$$} % 1000))
 sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 
 # use system jemalloc

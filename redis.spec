@@ -148,8 +148,6 @@ fi
 %defattr(644,root,root,755)
 %doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING INSTALL MANIFESTO README.md
 %attr(755,root,root) %{_bindir}/redis-benchmark
-%attr(755,root,root) %{_bindir}/redis-check-aof
-%attr(755,root,root) %{_bindir}/redis-check-rdb
 %attr(755,root,root) %{_bindir}/redis-cli
 
 %files server
@@ -158,6 +156,8 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_sbindir}/redis-sentinel
 %attr(755,root,root) %{_sbindir}/redis-server
+%attr(755,root,root) %{_bindir}/redis-check-aof
+%attr(755,root,root) %{_bindir}/redis-check-rdb
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/log/%{name}

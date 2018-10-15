@@ -13,12 +13,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	2.8.24
+Version:	4.0.11
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	7b6eb6e4ccc050c351df8ae83c55a035
+# Source0-md5:	e62d3793f86a6a0021609c9f905cb960
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
@@ -91,10 +91,10 @@ ln -s %{_includedir} deps/jemalloc/include
 %define specflags -std=c99 -pedantic
 %define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags}" LDFLAGS="%{rpmldflags}" OPTIMIZATION="" DEBUG="" V=1
 
-%{__make} -j1 -C src all
+%{__make} -C src all
 
 %if %{with tests}
-%{__make} -j1 test
+%{__make} test
 %endif
 
 %install
@@ -146,10 +146,10 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING 00-RELEASENOTES BUGS README
+%doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING INSTALL MANIFESTO README.md
 %attr(755,root,root) %{_bindir}/redis-benchmark
 %attr(755,root,root) %{_bindir}/redis-check-aof
-%attr(755,root,root) %{_bindir}/redis-check-dump
+%attr(755,root,root) %{_bindir}/redis-check-rdb
 %attr(755,root,root) %{_bindir}/redis-cli
 
 %files server

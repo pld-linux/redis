@@ -24,6 +24,7 @@ Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
+Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 BuildRequires:	jemalloc-static
@@ -72,6 +73,7 @@ disk.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # Remove integration tests
 %{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl
@@ -102,7 +104,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}} \
-	$RPM_BUILD_ROOT%{systemdtmpfilesdir}
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
+	$RPM_BUILD_ROOT%{_mandir}/man{1,5}
 
 %{__make} install \
 	INSTALL="install -p" \
@@ -120,6 +123,18 @@ install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+
+# man-pages
+for man in man/man1/*; do
+	install $man $RPM_BUILD_ROOT%{_mandir}/man1
+done
+for man in man/man5/*; do
+	install $man $RPM_BUILD_ROOT%{_mandir}/man5
+done
+
+# sentinel can be symlinked
+echo ".so man1/redis-server.1" > $RPM_BUILD_ROOT%{_mandir}/man1/redis-sentinel.1
+echo ".so man5/redis.conf.5" > $RPM_BUILD_ROOT%{_mandir}/man5/redis-sentinel.conf.5
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -149,6 +164,8 @@ fi
 %doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING INSTALL MANIFESTO README.md
 %attr(755,root,root) %{_bindir}/redis-benchmark
 %attr(755,root,root) %{_bindir}/redis-cli
+%{_mandir}/man1/redis-benchmark.1*
+%{_mandir}/man1/redis-cli.1*
 
 %files server
 %defattr(644,root,root,755)
@@ -164,3 +181,9 @@ fi
 %dir %attr(755,redis,root) %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
 %{systemdtmpfilesdir}/%{name}.conf
+%{_mandir}/man1/redis-sentinel.1*
+%{_mandir}/man1/redis-server.1*
+%{_mandir}/man1/redis-check-aof.1*
+%{_mandir}/man1/redis-check-rdb.1*
+%{_mandir}/man5/redis.conf.5*
+%{_mandir}/man5/redis-sentinel.conf.5*

@@ -13,19 +13,18 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	5.0.13
+Version:	6.2.5
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	4869440edbc54a203df43180cb1d5bb6
+# Source0-md5:	db8a2b45eafbf1ead4353044fb70f581
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
-Patch3:		0002-install-redis-check-rdb-as-a-symlink-instead-of-dupl.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 BuildRequires:	jemalloc-static
@@ -75,7 +74,6 @@ disk.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 # Remove integration tests
 %{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl

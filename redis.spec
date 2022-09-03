@@ -91,7 +91,7 @@ ln -s %{_includedir} deps/jemalloc/include
 
 %build
 %define specflags -std=c99 -pedantic
-%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags}" LDFLAGS="%{rpmldflags}" OPTIMIZATION="" DEBUG="" V=1
+%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags}" LDFLAGS="%{rpmldflags}" OPTIMIZATION="" DEBUG="" V=1 uname_M=%{_target_cpu}
 
 %{__make} -C src all
 

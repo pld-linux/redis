@@ -25,6 +25,7 @@ Source3:	%{name}.tmpfiles
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
+Patch3:		arm-arch-check.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 BuildRequires:	jemalloc-static
@@ -77,6 +78,7 @@ disk.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 # Remove integration tests
 %{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl

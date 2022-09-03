@@ -1,0 +1,56 @@
+From 2ad19f9492fa21ea733f191a38b379ca31f4657d Mon Sep 17 00:00:00 2001
+From: Jan Palus <jpalus@fastmail.com>
+Date: Sat, 3 Sep 2022 18:27:24 +0200
+Subject: [PATCH] Make ARM arch check more consistent
+
+There are three different type of checks if build is for ARM:
+- exact (ifneq0 match for only armv6 and armv7 (arm < 6 not being
+  included)
+- filter match (broken due to lack of wildcard)
+- substring match
+
+Unifiy them all and settle for $(filter armv%,$(uname_M)) as most
+generic and correct.
+---
+ src/Makefile | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index fdfef2b3c..7334ab9d8 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -57,19 +57,17 @@ endif
+ 
+ # Default allocator defaults to Jemalloc if it's not an ARM
+ MALLOC=libc
+-ifneq ($(uname_M),armv6l)
+-ifneq ($(uname_M),armv7l)
++ifeq (,$(filter armv%,$(uname_M)))
+ ifeq ($(uname_S),Linux)
+ 	MALLOC=jemalloc
+ endif
+ endif
+-endif
+ 
+ # To get ARM stack traces if Redis crashes we need a special C flag.
+-ifneq (,$(filter aarch64 armv,$(uname_M)))
++ifneq (,$(filter aarch64 armv%,$(uname_M)))
+         CFLAGS+=-funwind-tables
+ else
+-ifneq (,$(findstring armv,$(uname_M)))
++ifneq (,$(filter armv%,$(uname_M)))
+         CFLAGS+=-funwind-tables
+ endif
+ endif
+@@ -121,7 +119,7 @@ FINAL_LIBS=-lm
+ DEBUG=-g -ggdb
+ 
+ # Linux ARM32 needs -latomic at linking time
+-ifneq (,$(findstring armv,$(uname_M)))
++ifneq (,$(filter armv%,$(uname_M)))
+         FINAL_LIBS+=-latomic
+ endif
+ 
+-- 
+2.37.3
+

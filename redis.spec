@@ -141,10 +141,8 @@ mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-sentinel
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
-%if %{with systemd}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
-%{__sed} -e 's;@sbindir@;%{_sbindir};' -e 's;@localstatedir@;%{_localstatedir};' %{SOURCE4} > $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service
-%endif
+%{?with_systemd:%{__sed} -e 's;@sbindir@;%{_sbindir};' -e 's;@localstatedir@;%{_localstatedir};' %{SOURCE4} > $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service}
 
 # man-pages
 for man in man/man1/*; do
@@ -207,10 +205,8 @@ fi
 %dir %attr(750,redis,redis) %{_localstatedir}/log/%{name}
 %dir %attr(750,redis,redis) %{_localstatedir}/log/archive/%{name}
 %dir %attr(750,redis,redis) %{_localstatedir}/run/%{name}
-%if %{with systemd}
 %{systemdtmpfilesdir}/%{name}.conf
-%{systemdunitdir}/%{name}.service
-%endif
+%{?with_systemd:%{systemdunitdir}/%{name}.service}
 %{_mandir}/man1/redis-sentinel.1*
 %{_mandir}/man1/redis-server.1*
 %{_mandir}/man1/redis-check-aof.1*

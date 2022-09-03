@@ -1,11 +1,11 @@
 # TODO
 # - Check for status of man pages http://code.google.com/p/redis/issues/detail?id=202
-# - use shared jemalloc?
 #
 # Conditional build:
 %bcond_without	tests		# build without tests
 %bcond_without	perftools	# google perftools
 %bcond_without	systemd		# systemd support
+%bcond_without	system_jemalloc	# use embedded jemalloc
 
 %ifnarch %{ix86} %{x8664} ppc
 # available only on selected architectures
@@ -27,9 +27,10 @@ Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 Patch3:		arm-arch-check.patch
+Patch4:		system-jemalloc.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
-BuildRequires:	jemalloc-static
+BuildRequires:	jemalloc-devel
 %ifarch %{arm}
 BuildRequires:	libatomic-devel
 %endif
@@ -83,6 +84,7 @@ disk.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 # Remove integration tests
 %{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl
@@ -92,11 +94,7 @@ disk.
 port=$((21110 + ${RANDOM:-$$} % 1000))
 sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 
-# use system jemalloc
-mv deps/jemalloc{,-local}
-install -d deps/jemalloc
-ln -s %{_libdir} deps/jemalloc/lib
-ln -s %{_includedir} deps/jemalloc/include
+%{__rm} -r deps/jemalloc
 
 %build
 %define specflags -std=c99 -pedantic

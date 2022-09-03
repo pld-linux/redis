@@ -1,0 +1,14 @@
+--- redis-6.2.5/src/Makefile.orig	2021-07-21 20:06:49.000000000 +0200
++++ redis-6.2.5/src/Makefile	2022-09-03 18:49:53.269090855 +0200
+@@ -229,9 +227,8 @@
+ endif
+ 
+ ifeq ($(MALLOC),jemalloc)
+-	DEPENDENCY_TARGETS+= jemalloc
+-	FINAL_CFLAGS+= -DUSE_JEMALLOC -I../deps/jemalloc/include
+-	FINAL_LIBS := ../deps/jemalloc/lib/libjemalloc.a $(FINAL_LIBS)
++	FINAL_CFLAGS+= -DUSE_JEMALLOC $(shell $(PKG_CONFIG) --cflags jemalloc)
++	FINAL_LIBS := $(FINAL_LIBS) $(shell $(PKG_CONFIG) --libs jemalloc)
+ endif
+ 
+ ifeq ($(BUILD_TLS),yes)

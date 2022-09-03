@@ -24,6 +24,7 @@ Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.service
+Source5:	%{name}.sysconfig
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
@@ -120,7 +121,7 @@ sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},/etc/sysconfig,%{_sbindir}} \
 	$RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}} \
 	$RPM_BUILD_ROOT%{systemdtmpfilesdir} $RPM_BUILD_ROOT%{systemdunitdir} \
@@ -143,6 +144,7 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 %{?with_systemd:%{__sed} -e 's;@sbindir@;%{_sbindir};' -e 's;@localstatedir@;%{_localstatedir};' %{SOURCE4} > $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service}
+%{__sed} -e 's;@sysconfdir@;%{_sysconfdir};' %{SOURCE5} > $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # man-pages
 for man in man/man1/*; do
@@ -194,7 +196,8 @@ fi
 
 %files server
 %defattr(644,root,root,755)
-%config(noreplace) %{_sysconfdir}/%{name}.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_sbindir}/redis-sentinel
 %attr(755,root,root) %{_sbindir}/redis-server

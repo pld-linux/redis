@@ -1,0 +1,1 @@
+CONFIG_FILE=@sysconfdir@/redis.conf

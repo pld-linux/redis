@@ -5,7 +5,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=@sbindir@/redis-server --supervised systemd --daemonize no
+EnvironmentFile=-/etc/sysconfig/redis
+ExecStart=@sbindir@/redis-server $CONFIG_FILE --supervised systemd --daemonize no
 LimitNOFILE=10032
 NoNewPrivileges=yes
 Type=notify

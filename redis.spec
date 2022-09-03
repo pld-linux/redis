@@ -203,10 +203,10 @@ fi
 %attr(755,root,root) %{_bindir}/redis-check-aof
 %attr(755,root,root) %{_bindir}/redis-check-rdb
 %config(noreplace) /etc/logrotate.d/%{name}
-%dir %attr(755,redis,root) %{_localstatedir}/lib/%{name}
-%dir %attr(755,redis,root) %{_localstatedir}/log/%{name}
-%dir %attr(755,redis,root) %{_localstatedir}/log/archive/%{name}
-%dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
+%dir %attr(750,redis,redis) %{_localstatedir}/lib/%{name}
+%dir %attr(750,redis,redis) %{_localstatedir}/log/%{name}
+%dir %attr(750,redis,redis) %{_localstatedir}/log/archive/%{name}
+%dir %attr(750,redis,redis) %{_localstatedir}/run/%{name}
 %if %{with systemd}
 %{systemdtmpfilesdir}/%{name}.conf
 %{systemdunitdir}/%{name}.service

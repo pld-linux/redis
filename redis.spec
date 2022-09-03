@@ -30,7 +30,9 @@ Patch3:		arm-arch-check.patch
 Patch4:		system-jemalloc.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
+%ifnarch %{arm}
 BuildRequires:	jemalloc-devel
+%endif
 %ifarch %{arm}
 BuildRequires:	libatomic-devel
 %endif

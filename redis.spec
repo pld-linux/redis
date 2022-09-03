@@ -28,6 +28,9 @@ Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 URL:		http://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 BuildRequires:	jemalloc-static
+%ifarch %{arm}
+BuildRequires:	libatomic-devel
+%endif
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0

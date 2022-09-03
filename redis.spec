@@ -23,6 +23,7 @@ Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
+Source4:	%{name}.service
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
@@ -39,7 +40,7 @@ BuildRequires:	libatomic-devel
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.202
+BuildRequires:	rpmbuild(macros) >= 2.011
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel}
 %{?with_tests:BuildRequires:	tcl >= 8.5}
@@ -122,7 +123,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_localstatedir}/{{lib,log,run}/%{name},log/archive/%{name}} \
-	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir} $RPM_BUILD_ROOT%{systemdunitdir} \
 	$RPM_BUILD_ROOT%{_mandir}/man{1,5}
 
 %{__make} install \
@@ -141,6 +142,7 @@ install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 cp -p %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+%{?with_systemd:%{__sed} -e 's;@sbindir@;%{_sbindir};' -e 's;@localstatedir@;%{_localstatedir};' %{SOURCE4} > $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service}
 
 # man-pages
 for man in man/man1/*; do
@@ -164,6 +166,7 @@ rm -rf $RPM_BUILD_ROOT
 %post server
 /sbin/chkconfig --add redis
 %service redis restart
+%{?with_systemd:%systemd_post %{name}.service}
 
 %preun server
 if [ "$1" = 0 ]; then
@@ -176,6 +179,10 @@ if [ "$1" = "0" ]; then
 	%userremove redis
 	%groupremove redis
 fi
+%{?with_systemd:%systemd_reload}
+
+%triggerpostun server -- redis-server < 6.2.5-2
+%{?with_systemd?%systemd_trigger %{name}.service}
 
 %files
 %defattr(644,root,root,755)
@@ -199,6 +206,7 @@ fi
 %dir %attr(755,redis,root) %{_localstatedir}/log/archive/%{name}
 %dir %attr(755,redis,root) %{_localstatedir}/run/%{name}
 %{systemdtmpfilesdir}/%{name}.conf
+%{?with_systemd:%{systemdunitdir}/%{name}.service}
 %{_mandir}/man1/redis-sentinel.1*
 %{_mandir}/man1/redis-server.1*
 %{_mandir}/man1/redis-check-aof.1*

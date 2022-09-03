@@ -5,6 +5,7 @@
 # Conditional build:
 %bcond_without	tests		# build without tests
 %bcond_without	perftools	# google perftools
+%bcond_without	systemd		# systemd support
 
 %ifnarch %{ix86} %{x8664} ppc
 # available only on selected architectures
@@ -32,9 +33,12 @@ BuildRequires:	jemalloc-static
 %ifarch %{arm}
 BuildRequires:	libatomic-devel
 %endif
+BuildRequires:	openssl-devel
+BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	sed >= 4.0
+%{?with_systemd:BuildRequires:	systemd-devel}
 %{?with_tests:BuildRequires:	tcl >= 8.5}
 Obsoletes:	redis-doc
 Conflicts:	logrotate < 3.8.0
@@ -96,7 +100,16 @@ ln -s %{_includedir} deps/jemalloc/include
 
 %build
 %define specflags -std=c99 -pedantic
-%define _make_opts CC="%{__cc}" CFLAGS="%{rpmcflags}" LDFLAGS="%{rpmldflags}" OPTIMIZATION="" DEBUG="" V=1 uname_M=%{_target_cpu}
+%define _make_opts \\\
+	CC="%{__cc}" \\\
+	CFLAGS="%{rpmcflags}" \\\
+	LDFLAGS="%{rpmldflags}" \\\
+	OPTIMIZATION="" \\\
+	DEBUG="" \\\
+	BUILD_TLS=yes \\\
+	USE_SYSTEMD=%{?with_systemd:yes}%{!?with_systemd:no} \\\
+	V=1 \\\
+	uname_M=%{_target_cpu}
 
 %{__make} -C src all
 

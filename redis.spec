@@ -14,12 +14,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	6.2.5
+Version:	6.2.11
 Release:	1
 License:	BSD
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	db8a2b45eafbf1ead4353044fb70f581
+# Source0-md5:	63ed5185723511200f7c0e2a811730dc
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles

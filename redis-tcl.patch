@@ -3,7 +3,7 @@ diff -ur redis-2.8.2.orig/runtest redis-2.8.2/runtest
 +++ redis-2.8.2/runtest	2013-12-04 21:57:48.613385391 +0100
 @@ -1,10 +1,6 @@
  #!/bin/sh
--TCL_VERSIONS="8.5 8.6"
+-TCL_VERSIONS="8.5 8.6 8.7"
 -TCLSH=""
 -
 -for VERSION in $TCL_VERSIONS; do

@@ -1,6 +1,6 @@
---- redis-6.2.5/src/Makefile.orig	2021-07-21 20:06:49.000000000 +0200
-+++ redis-6.2.5/src/Makefile	2022-09-03 18:49:53.269090855 +0200
-@@ -229,9 +227,8 @@
+--- redis-8.0.1/src/Makefile~	2025-05-20 12:52:44.000000000 +0200
++++ redis-8.0.1/src/Makefile	2025-05-20 12:53:23.940397821 +0200
+@@ -278,9 +278,8 @@ ifeq ($(MALLOC),tcmalloc_minimal)
  endif
  
  ifeq ($(MALLOC),jemalloc)
@@ -11,4 +11,4 @@
 +	FINAL_LIBS := $(FINAL_LIBS) $(shell $(PKG_CONFIG) --libs jemalloc)
  endif
  
- ifeq ($(BUILD_TLS),yes)
+ # LIBSSL & LIBCRYPTO

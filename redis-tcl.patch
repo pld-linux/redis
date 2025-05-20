@@ -14,12 +14,12 @@ diff -ur redis-2.8.2.orig/runtest redis-2.8.2/runtest
  
  if [ -z $TCLSH ]
  then
-diff -ur redis-2.8.2.orig/utils/speed-regression.tcl redis-2.8.2/utils/speed-regression.tcl
---- redis-2.8.2.orig/utils/speed-regression.tcl	2013-12-02 16:07:46.000000000 +0100
-+++ redis-2.8.2/utils/speed-regression.tcl	2013-12-04 22:03:43.745711543 +0100
+--- redis-8.0.1/utils/speed-regression.tcl~	2025-05-13 15:28:36.000000000 +0200
++++ redis-8.0.1/utils/speed-regression.tcl	2025-05-20 12:49:50.356129476 +0200
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env tclsh8.5
 +#!/usr/bin/tclsh
- # Copyright (C) 2011 Salvatore Sanfilippo
- # Released under the BSD license like Redis itself
- 
+ # Copyright (C) 2011-Present Redis Ltd. All rights reserved.
+ #
+ # Licensed under your choice of (a) the Redis Source Available License 2.0
+

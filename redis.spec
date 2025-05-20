@@ -14,12 +14,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	6.2.11
+Version:	8.0.1
 Release:	1
-License:	BSD
+License:	AGPLv3
 Group:		Applications/Databases
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	63ed5185723511200f7c0e2a811730dc
+# Source0-md5:	065162870a195ac75c878c2e2e66f035
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
@@ -84,11 +84,11 @@ disk.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
 
 # Remove integration tests
 %{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl
@@ -101,7 +101,6 @@ sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 %{__rm} -r deps/jemalloc
 
 %build
-%define specflags -std=c99 -pedantic
 %define _make_opts \\\
 	CC="%{__cc}" \\\
 	CFLAGS="%{rpmcflags}" \\\
@@ -188,7 +187,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING INSTALL MANIFESTO README.md
+%doc 00-RELEASENOTES BUGS CONTRIBUTING.md INSTALL LICENSE.txt MANIFESTO README.md
 %attr(755,root,root) %{_bindir}/redis-benchmark
 %attr(755,root,root) %{_bindir}/redis-cli
 %{_mandir}/man1/redis-benchmark.1*

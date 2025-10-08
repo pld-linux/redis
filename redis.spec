@@ -14,12 +14,12 @@
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	8.0.1
+Version:	8.2.2
 Release:	1
 License:	AGPLv3
 Group:		Applications/Databases
-Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	065162870a195ac75c878c2e2e66f035
+Source0:	https://download.redis.io/releases/%{name}-%{version}.tar.gz
+# Source0-md5:	1ad91da12a1d88b616edc2eb016bebc1
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
@@ -30,7 +30,7 @@ Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 Patch3:		arm-arch-check.patch
 Patch4:		system-jemalloc.patch
-URL:		http://www.redis.io/
+URL:		https://www.redis.io/
 %{?with_perftools:BuildRequires:    gperftools-devel}
 %ifnarch %{arm}
 BuildRequires:	jemalloc-devel

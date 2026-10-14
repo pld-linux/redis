@@ -1,9 +1,11 @@
-diff -ur redis-2.8.2.orig/runtest redis-2.8.2/runtest
---- redis-2.8.2.orig/runtest	2013-12-02 16:07:46.000000000 +0100
-+++ redis-2.8.2/runtest	2013-12-04 21:57:48.613385391 +0100
-@@ -1,10 +1,6 @@
- #!/bin/sh
--TCL_VERSIONS="8.5 8.6 8.7"
+PLD tcl ships only an unversioned tclsh binary
+--- redis-8.10.2.orig/runtest	2026-10-14 21:22:42.962801791 +0200
++++ redis-8.10.2/runtest	2026-10-14 21:22:43.039229693 +0200
+@@ -4,12 +4,8 @@
+ if [ -n "$OPEN_FILE_LIMIT" ] && [ "$OPEN_FILE_LIMIT" != "unlimited" ] && [ "$OPEN_FILE_LIMIT" -lt 1024 ]; then
+     ulimit -n 1024 2>/dev/null || true
+ fi
+-TCL_VERSIONS="8.5 8.6 8.7 9.0"
 -TCLSH=""
 -
 -for VERSION in $TCL_VERSIONS; do
@@ -14,12 +16,11 @@ diff -ur redis-2.8.2.orig/runtest redis-2.8.2/runtest
  
  if [ -z $TCLSH ]
  then
---- redis-8.0.1/utils/speed-regression.tcl~	2025-05-13 15:28:36.000000000 +0200
-+++ redis-8.0.1/utils/speed-regression.tcl	2025-05-20 12:49:50.356129476 +0200
+--- redis-8.10.2.orig/utils/speed-regression.tcl	2026-10-14 21:22:42.962801791 +0200
++++ redis-8.10.2/utils/speed-regression.tcl	2026-10-14 21:22:43.039664960 +0200
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env tclsh8.5
 +#!/usr/bin/tclsh
  # Copyright (C) 2011-Present Redis Ltd. All rights reserved.
  #
  # Licensed under your choice of (a) the Redis Source Available License 2.0
-

@@ -3,23 +3,17 @@
 #
 # Conditional build:
 %bcond_without	tests		# build without tests
-%bcond_without	perftools	# google perftools
 %bcond_without	systemd		# systemd support
-%bcond_without	system_jemalloc	# use embedded jemalloc
-
-%ifnarch %{ix86} %{x8664} ppc
-# available only on selected architectures
-%undefine	with_perftools
-%endif
+%bcond_with	system_jemalloc	# use system jemalloc (no active defragmentation)
 
 Summary:	A persistent key-value database
 Name:		redis
-Version:	8.2.2
+Version:	8.10.2
 Release:	1
 License:	AGPLv3
 Group:		Applications/Databases
 Source0:	https://download.redis.io/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	1ad91da12a1d88b616edc2eb016bebc1
+# Source0-md5:	8773d06d8e3ef87ac9357a943e1f3070
 Source1:	%{name}.logrotate
 Source2:	%{name}.init
 Source3:	%{name}.tmpfiles
@@ -28,13 +22,9 @@ Source5:	%{name}.sysconfig
 Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
-Patch3:		arm-arch-check.patch
-Patch4:		system-jemalloc.patch
+Patch3:		system-jemalloc.patch
 URL:		https://www.redis.io/
-%{?with_perftools:BuildRequires:    gperftools-devel}
-%ifnarch %{arm}
-BuildRequires:	jemalloc-devel
-%endif
+%{?with_system_jemalloc:BuildRequires:	jemalloc-devel}
 %ifarch %{arm}
 BuildRequires:	libatomic-devel
 %endif
@@ -45,7 +35,8 @@ BuildRequires:	rpmbuild(macros) >= 2.011
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel}
 %{?with_tests:BuildRequires:	tcl >= 8.5}
-Obsoletes:	redis-doc
+BuildRequires:	zstd-devel
+Obsoletes:	redis-doc < 2.4.2
 Conflicts:	logrotate < 3.8.0
 ExcludeArch:	sparc sparc64 alpha
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -87,18 +78,11 @@ disk.
 %patch -P0 -p1
 %patch -P1 -p1
 %patch -P2 -p1
+%if %{with system_jemalloc}
 %patch -P3 -p1
-%patch -P4 -p1
-
-# Remove integration tests
-%{__sed} -i -e '/    integration\/replication/d' tests/test_helper.tcl
-%{__sed} -i -e '/    unit\/memefficiency/d' tests/test_helper.tcl
-
-# randomize port number so concurrent builds doesn't break
-port=$((21110 + ${RANDOM:-$$} % 1000))
-sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 
 %{__rm} -r deps/jemalloc
+%endif
 
 %build
 %define _make_opts \\\
@@ -108,6 +92,7 @@ sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 	OPTIMIZATION="" \\\
 	DEBUG="" \\\
 	BUILD_TLS=yes \\\
+	BUILD_COMPRESSION=yes \\\
 	USE_SYSTEMD=%{?with_systemd:yes}%{!?with_systemd:no} \\\
 	V=1 \\\
 	uname_M=%{_target_cpu}
@@ -115,7 +100,18 @@ sed -i -e "s/set ::port 21111/set ::port $port/" tests/test_helper.tcl
 %{__make} -C src all
 
 %if %{with tests}
-%{__make} test
+# randomize port number so concurrent builds doesn't break
+# replication, cluster add-node and CLAIM idle reset tests depend on timing and fail on a loaded builder
+# memory efficiency, defrag and embedded key MEMORY USAGE tests expect bundled jemalloc
+./runtest \
+	--baseport $((21110 + ${RANDOM:-$$} % 1000)) \
+	$(for t in tests/integration/replication*.tcl; do t=${t#tests/}; echo "--skipunit ${t%.tcl}"; done) \
+%if %{with system_jemalloc}
+	--skipunit unit/memefficiency \
+	--skiptest 'Check MEMORY USAGE for embedded key strings with jemalloc' \
+%endif
+	--skiptest '/^redis-cli -4 --cluster add-node using ' \
+	--skiptest 'XREADGROUP CLAIM idle time resets after RDB reload'
 %endif
 
 %install
@@ -136,6 +132,9 @@ chmod a+x $RPM_BUILD_ROOT%{_bindir}/%{name}-*
 # Ensure redis-server location doesn't change
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-server
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/%{name}-sentinel
+# upstream symlinks point to redis-server in the same directory
+ln -sf ../sbin/%{name}-server $RPM_BUILD_ROOT%{_bindir}/%{name}-check-aof
+ln -sf ../sbin/%{name}-server $RPM_BUILD_ROOT%{_bindir}/%{name}-check-rdb
 
 # Install misc other
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
@@ -195,13 +194,14 @@ fi
 
 %files server
 %defattr(644,root,root,755)
+%doc sentinel.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
-%attr(755,root,root) %{_sbindir}/redis-sentinel
+%{_sbindir}/redis-sentinel
 %attr(755,root,root) %{_sbindir}/redis-server
-%attr(755,root,root) %{_bindir}/redis-check-aof
-%attr(755,root,root) %{_bindir}/redis-check-rdb
+%{_bindir}/redis-check-aof
+%{_bindir}/redis-check-rdb
 %config(noreplace) /etc/logrotate.d/%{name}
 %dir %attr(750,redis,redis) %{_localstatedir}/lib/%{name}
 %dir %attr(750,redis,redis) %{_localstatedir}/log/%{name}

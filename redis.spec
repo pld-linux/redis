@@ -9,7 +9,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	8.10.2
-Release:	1
+Release:	2
 License:	AGPLv3
 Group:		Applications/Databases
 Source0:	https://download.redis.io/releases/%{name}-%{version}.tar.gz
@@ -103,12 +103,16 @@ disk.
 # randomize port number so concurrent builds doesn't break
 # replication, cluster add-node and CLAIM idle reset tests depend on timing and fail on a loaded builder
 # memory efficiency, defrag and embedded key MEMORY USAGE tests expect bundled jemalloc
+# on 32-bit IDMP streams fragmentation stays around the 5% lower threshold, so defrag may never stop
 ./runtest \
 	--baseport $((21110 + ${RANDOM:-$$} % 1000)) \
 	$(for t in tests/integration/replication*.tcl; do t=${t#tests/}; echo "--skipunit ${t%.tcl}"; done) \
 %if %{with system_jemalloc}
 	--skipunit unit/memefficiency \
 	--skiptest 'Check MEMORY USAGE for embedded key strings with jemalloc' \
+%endif
+%ifarch %{ix86} %{arm} x32
+	--skiptest '/^Active defrag IDMP streams: ' \
 %endif
 	--skiptest '/^redis-cli -4 --cluster add-node using ' \
 	--skiptest 'XREADGROUP CLAIM idle time resets after RDB reload'

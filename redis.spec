@@ -9,7 +9,7 @@
 Summary:	A persistent key-value database
 Name:		redis
 Version:	8.10.2
-Release:	2
+Release:	3
 License:	AGPLv3
 Group:		Applications/Databases
 Source0:	https://download.redis.io/releases/%{name}-%{version}.tar.gz
@@ -23,6 +23,7 @@ Patch0:		%{name}.conf.patch
 Patch1:		%{name}-tcl.patch
 Patch2:		0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 Patch3:		system-jemalloc.patch
+Patch4:		%{name}-x32-mcontext.patch
 URL:		https://www.redis.io/
 %{?with_system_jemalloc:BuildRequires:	jemalloc-devel}
 %ifarch %{arm}
@@ -78,6 +79,7 @@ disk.
 %patch -P0 -p1
 %patch -P1 -p1
 %patch -P2 -p1
+%patch -P4 -p1
 %if %{with system_jemalloc}
 %patch -P3 -p1
 

@@ -1,0 +1,41 @@
+x32 has the 64-bit x86_64 mcontext layout; using i386 register indices there makes the
+crash handler read RCX as EIP and R15 as the stack pointer and crash again while reporting
+
+--- redis-8.10.2.orig/src/debug.c	2026-10-15 09:05:28.932800927 +0200
++++ redis-8.10.2/src/debug.c	2026-10-15 09:05:55.672229062 +0200
+@@ -1426,7 +1426,7 @@
+     return NULL;\
+ } while(0)
+ #define GET_SET_RETURN(target_var, new_val) do {\
+-    void *old_val = (void*)target_var; \
++    void *old_val = (void*)(uintptr_t)target_var; \
+     if (new_val) { \
+         void **temp = (void**)&target_var; \
+         *temp = new_val; \
+@@ -1458,7 +1458,7 @@
+     #endif
+ #elif defined(__linux__)
+     /* Linux */
+-    #if defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
++    #if defined(__i386__)
+     GET_SET_RETURN(uc->uc_mcontext.gregs[14], eip);
+     #elif defined(__X86_64__) || defined(__x86_64__)
+     GET_SET_RETURN(uc->uc_mcontext.gregs[16], eip);
+@@ -1652,7 +1652,7 @@
+ /* Linux */
+ #elif defined(__linux__)
+     /* Linux x86 */
+-    #if defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
++    #if defined(__i386__)
+     serverLog(LL_WARNING,
+     "\n"
+     "EAX:%08lx EBX:%08lx ECX:%08lx EDX:%08lx\n"
+@@ -1706,7 +1706,7 @@
+         (unsigned long) uc->uc_mcontext.gregs[17],
+         (unsigned long) uc->uc_mcontext.gregs[18]
+     );
+-    logStackContent((void**)uc->uc_mcontext.gregs[15]);
++    logStackContent((void**)(uintptr_t)uc->uc_mcontext.gregs[15]);
+     #elif defined(__riscv) /* Linux RISC-V */
+     serverLog(LL_WARNING,
+ 	"\n"
